@@ -1,4 +1,4 @@
-# Guía del proyecto — Convertir PDF, audio y subtítulos a Markdown (local)
+# Guía del proyecto — Convertir documentos, audio y subtítulos a Markdown (local)
 
 > **Si eres un agente (Claude Code) leyendo esto:** tu tarea es dejar este set de herramientas
 > funcionando en la máquina del usuario. Haz lo siguiente en orden:
@@ -13,7 +13,7 @@
 
 ## 1. ¿Qué es esto?
 
-Un conjunto de scripts sobre **[MarkItDown](https://github.com/microsoft/markitdown)** (Microsoft) para convertir documentos a **Markdown limpio**, pensado para leer con LLMs o archivar como texto. Cubre tres entradas principales — **PDF**, **audio** y **subtítulos** — más utilidades de **OCR** y el sentido inverso **Markdown → PDF**.
+Un conjunto de scripts sobre **[MarkItDown](https://github.com/microsoft/markitdown)** (Microsoft) para convertir documentos a **Markdown limpio**, pensado para leer con LLMs o archivar como texto. Cubre tres entradas principales — **documentos** (PDF y también docx/pptx/xlsx/html), **audio** y **subtítulos** — más utilidades de **OCR** y el sentido inverso **Markdown → PDF**.
 
 La idea de fondo: MarkItDown ya convierte muchos formatos, pero (a) los PDFs de ciertas fuentes salen con defectos tipográficos, (b) no hace OCR, y (c) no transcribe audio con buena calidad. Estos scripts rellenan esos huecos y dejan una salida Markdown legible.
 
@@ -23,7 +23,7 @@ La idea de fondo: MarkItDown ya convierte muchos formatos, pero (a) los PDFs de 
 
 | Caso de uso | Script | Cuándo usarlo | Salida |
 |---|---|---|---|
-| **PDF → Markdown** (con reparador) | `convertir_pdf.py` | Un PDF con texto real (libros, normas, informes). Repara ligaduras rotas y tabuladores. | `.md` junto al PDF |
+| **Documentos → Markdown** (con reparador) | `convertir_pdf.py` | PDF con texto real (libros, normas, informes) y también **docx/pptx/xlsx/html** (vía MarkItDown). En PDF repara ligaduras rotas y tabuladores. | `.md` junto al original |
 | **PDF → Markdown en lote** | `batch_convert.py` | Una carpeta entera de PDFs; convierte solo los que aún no tienen `.md`. | Un `.md` por PDF |
 | **OCR de PDF → Markdown** | `ocr_pdf.py` | PDFs **escaneados** (solo imágenes) o con capa de texto corrupta, donde la extracción normal falla. | `.md` (texto reconocido) |
 | **Audio → Markdown** | `transcribir_audio.py` | Notas de voz, reuniones, audiolibros (mp3/m4a/wav/mp4…). Transcribe con faster-whisper. | `.md` en párrafos |
@@ -110,7 +110,7 @@ uv venv --python=3.12 .venv
 
 A partir de aquí, el intérprete del proyecto es `./.venv/bin/python`.
 
-### 4.2 Base: PDF → Markdown (obligatorio)
+### 4.2 Base: documentos → Markdown (obligatorio)
 
 ```bash
 uv pip install --python .venv/bin/python 'markitdown[all]' wordfreq
@@ -164,9 +164,9 @@ uv pip install --python .venv/bin/python yt-dlp
 
 Crea cada archivo con **el nombre exacto del encabezado**, dentro de la carpeta del proyecto (junto a `.venv/`). Todos comparten el estilo: salida `.md`, mensajes de progreso a `stderr`, y la ruta de salida final a `stdout`.
 
-### 5.1 `convertir_pdf.py` — PDF → Markdown con reparador de ligaduras
+### 5.1 `convertir_pdf.py` — Documentos (PDF/Office/HTML) → Markdown con reparador de ligaduras
 
-Convierte un archivo con MarkItDown y, **solo si detecta el defecto**, reconstruye las ligaduras tipográficas (fi/fl/ff…) que algunos PDFs exportan como carácter nulo, eligiendo por frecuencia de palabra real la reconstrucción correcta. También normaliza tabuladores usados como separadores. Autodetecta el idioma (es/en).
+Convierte a Markdown cualquier formato que soporte MarkItDown — **PDF, docx, pptx, xlsx, html…** — y, **solo si detecta el defecto** (típico de PDFs), reconstruye las ligaduras tipográficas (fi/fl/ff…) que algunos exportan como carácter nulo, eligiendo por frecuencia de palabra real la reconstrucción correcta. También normaliza tabuladores usados como separadores. Autodetecta el idioma (es/en).
 
 ~~~python
 #!/usr/bin/env python
@@ -1076,8 +1076,9 @@ if __name__ == "__main__":
 ## 6. Cómo correr cada caso (ejemplos)
 
 ```bash
-# --- PDF único -> Markdown (repara ligaduras si hace falta) ---
+# --- Documento único -> Markdown (repara ligaduras si hace falta) ---
 .venv/bin/python convertir_pdf.py "documento.pdf"                 # crea documento.md al lado
+.venv/bin/python convertir_pdf.py "presentacion.pptx"            # también docx, xlsx, html…
 .venv/bin/python convertir_pdf.py "documento.pdf" -o salida.md    # salida explícita
 .venv/bin/python convertir_pdf.py "documento.pdf" --no-fix        # sin reparar (crudo)
 
