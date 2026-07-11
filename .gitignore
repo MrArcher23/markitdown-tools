@@ -1,0 +1,20 @@
+# Entorno virtual y cachés
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.cache/
+.pytest_cache/
+
+# Datos locales / salidas (NO publicar): audio, PDFs y sus conversiones
+*.mp3
+*.mp4
+*.m4a
+*.wav
+*.ogg
+*.pdf
+
+# Sistema
+.DS_Store
+Thumbs.db
