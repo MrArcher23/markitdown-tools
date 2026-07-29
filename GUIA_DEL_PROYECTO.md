@@ -7,6 +7,8 @@
 > 3. Crea cada archivo de la **sección 5 (Los scripts)** con el nombre exacto indicado, dentro de la carpeta del proyecto.
 > 4. Valida con la **sección 7 (Verificación rápida)**.
 >
+> Si el repositorio ya está instalado y solo necesitas saber **qué puede hacer la herramienta y cómo invocarla**, lee [`AGENTS.md`](AGENTS.md) en vez de esta guía (capacidades, flags, límites y comandos, en formato corto).
+>
 > Todo es **100% local** (sin API, sin nube, sin enviar archivos a ningún servicio). No necesita permisos de root para lo esencial.
 
 ---
@@ -1093,9 +1095,13 @@ if __name__ == "__main__":
 .venv/bin/python transcribir_audio.py "audio.m4a" --device cpu --model small   # forzar CPU + modelo ligero
 .venv/bin/python transcribir_audio.py "audio.mp3" --lang es --title "Mi audio" -o salida.md
 
-# --- Subtítulos de YouTube -> Markdown ---
+# --- Subtítulos de YouTube -> Markdown (rápido, si el video tiene subtítulos) ---
 yt-dlp --skip-download --write-auto-subs --sub-langs es --sub-format json3 -o "video.%(ext)s" "URL_DE_YOUTUBE"
 .venv/bin/python subs_a_md.py "video.es.json3" -o video.md --title "Título" --url "URL_DE_YOUTUBE"
+
+# --- Video SIN subtítulos -> baja el audio y transcríbelo ---
+.venv/bin/yt-dlp -f bestaudio -o "video.%(ext)s" "URL_DE_YOUTUBE"   # sin -x: no necesitas ffmpeg
+.venv/bin/python transcribir_audio.py "video.webm"                  # PyAV lee webm/m4a directo
 
 # --- Markdown -> PDF ---
 .venv/bin/python md_a_pdf.py "documento.md"                       # crea documento.pdf
@@ -1125,8 +1131,9 @@ Un PDF convertido correctamente produce un `.md` con miles de caracteres. Si sal
 ## 8. Notas y límites
 
 - **Todo local y privado:** ningún script sube datos a internet (excepto la descarga inicial de modelos de Whisper la primera vez que transcribes, y `yt-dlp` que baja subtítulos de YouTube por diseño).
-- **PDF vacío = escaneado:** MarkItDown extrae texto, no hace OCR. Si el `.md` sale vacío, el PDF no tiene capa de texto → `ocr_pdf.py`.
+- **PDF vacío = escaneado:** MarkItDown extrae texto, no hace OCR. Si el `.md` sale vacío, el PDF no tiene capa de texto → `ocr_pdf.py`. **No hay respaldo automático:** `convertir_pdf.py` no avisa de que hace falta OCR; comprueba tú el tamaño del resultado.
+- **`batch_convert.py` solo procesa `.pdf`:** aunque `convertir_pdf.py` acepte docx/pptx/xlsx/html, el lote recoge únicamente PDFs (de forma recursiva). Para convertir en lote otros formatos, itera tú mismo sobre `convertir_pdf.py`.
 - **Reparador de ligaduras:** solo actúa si detecta el defecto (caracteres nulos donde iban fi/fl/ff…). Un PDF sano no se toca. Reporta a `stderr` las palabras "sin confirmar" por si quieres revisarlas.
 - **Audio sin ffmpeg:** gracias a PyAV. Formatos probados: mp3, m4a, wav, mp4 (audio), ogg.
 - **GPU:** la primera transcripción descarga el modelo (`large-v3-turbo` ≈ 1.5 GB) y tarda más; las siguientes son rápidas. En CPU, prefiere `--model small`/`medium`.
-- **Extensión avanzada (no cubierta):** `transcribir_audio.py --diarize` puede etiquetar hablantes con pyannote, pero requiere instalar torch/pyannote y un token de HuggingFace, y añade complejidad. Se deja fuera de esta guía a propósito para mantener la instalación limpia.
+- **Extensión avanzada (no cubierta):** `transcribir_audio.py --diarize` puede etiquetar hablantes con pyannote, pero requiere instalar torch/pyannote y un token de HuggingFace, y añade complejidad. Se deja fuera de esta guía a propósito para mantener la instalación limpia. Aviso si aun así la intentas: `torch` con CUDA arrastra **cuDNN 8**, que rompe el ASR en GPU (faster-whisper necesita **cuDNN 9**); la combinación que funciona es `torch` **CPU-only** + cuDNN 9 para la transcripción.

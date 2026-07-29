@@ -11,7 +11,7 @@ Conjunto de scripts sobre **[MarkItDown](https://github.com/microsoft/markitdown
 | Caso de uso | Script | Descripción |
 |---|---|---|
 | **Documentos → Markdown** (con reparador) | `convertir_pdf.py` | PDF y también **docx, pptx, xlsx, html…** (vía MarkItDown). En PDFs repara ligaduras rotas (fi/fl/ff) y tabuladores; autodetecta idioma |
-| **Lote → Markdown** | `batch_convert.py` | Una carpeta entera, en paralelo; solo los archivos que aún no tienen `.md` |
+| **Lote → Markdown** | `batch_convert.py` | Una carpeta entera de **PDFs** (recursivo), en paralelo; solo los que aún no tienen `.md` |
 | **OCR de PDF → Markdown** | `ocr_pdf.py` | Para PDFs escaneados o con capa de texto corrupta (RapidOCR, offline) |
 | **Audio → Markdown** | `transcribir_audio.py` | Transcribe con **faster-whisper** (modelo `large-v3-turbo`) en **GPU (~30× tiempo real)** o CPU, **sin ffmpeg** del sistema (PyAV); autodetecta idioma |
 | **Subtítulos → Markdown** | `subs_a_md.py` | Subtítulos json3 de YouTube (yt-dlp) → párrafos limpios |
