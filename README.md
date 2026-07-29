@@ -3,6 +3,8 @@
 Conjunto de scripts sobre **[MarkItDown](https://github.com/microsoft/markitdown)** para convertir **documentos, audio y subtítulos a Markdown limpio** (ideal para leer con LLMs o archivar como texto). Todo **100% local** (sin API, sin nube).
 
 > 📖 **Guía completa de instalación y uso (paso a paso, con los scripts explicados):** [`GUIA_DEL_PROYECTO.md`](GUIA_DEL_PROYECTO.md) — incluye instrucciones para Windows (WSL2).
+>
+> 🤖 **¿Eres un agente de IA (Claude Code, Cursor…)?** Empieza por [`AGENTS.md`](AGENTS.md) — capacidades, flags, límites y comportamientos no obvios.
 
 ## ¿Qué hace?
 
